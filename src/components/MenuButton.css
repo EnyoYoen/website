@@ -1,0 +1,83 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+
+:root {
+  /*--menu-button-primary-color: #42D6CA;
+  /*--menu-button-primary-color: #046eba;*/
+  --menu-button-primary-color: #00d6fc;
+  --menu-button-background-color: rgba(66, 214, 202, 0.2);
+  --menu-button-hover-background-color: rgba(66, 214, 202, 0.2);
+}
+
+@font-face {
+  font-family: "Reckoner";
+  src: url("/src/assets/fonts/Reckoner.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Iceland";
+  src: url("/src/assets/fonts/Iceland-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "BigShouldersDisplay";
+  src: url("/src/assets/fonts/BigShouldersDisplay-Regular.ttf")
+    format("truetype");
+}
+
+.menu-button {
+  background-color: var(--menu-button-background-color);
+  border-radius: 50px;
+  width: 95px;
+  height: 40px;
+  color: var(--menu-button-primary-color);
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  font-weight: normal;
+  letter-spacing: 1.8px;
+  font-size: 0.9em;
+}
+.menu-button-anim:hover {
+  border-radius: 50px;
+  background-color: var(--menu-button-hover-background-color);
+}
+.menu-button-anim:hover:before {
+  content: " ";
+  border-radius: 20px;
+  border: 2px var(--menu-button-primary-color) solid;
+  position: absolute;
+  box-sizing: border-box;
+  width: 95px;
+  height: 40px;
+  transition: all 0.7s ease;
+  animation: grow 1s infinite;
+}
+
+/*.menu-button {
+	background-color: rgba(66, 214, 202, 0.05);
+	border-radius: 50px;
+	color: #42D6CA;
+}
+.menu-button:hover {
+	background-color: rgba(66, 214, 202, 0.1);
+}
+.menu-button:hover:before {
+	content: ' ';
+	border-radius: 20px;
+	border: 2px #42D6CA solid;
+	position: absolute;
+	right: 42px;
+	top: 55px;
+	box-sizing: border-box;
+	width: 40px;
+	height: 40px;
+	transition: all .7s ease;
+	animation: grow 1s infinite;
+}*/
+@keyframes grow {
+  from {
+    transform: scale(0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.5, 1.5);
+    opacity: 0;
+  }
+}

@@ -1,0 +1,39 @@
+.menu-container {
+  background-image: url(/src/assets/images/vector/textbox.svg);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3059 / 2392; /* Hardcoded values, coming from the textbox.svg */
+  opacity: 0.75;
+  padding: 0% 15% 15% 10%;
+}
+
+.menu-container .minimize-button {
+  position: absolute;
+  top: 9%;
+  left: 75%;
+}
+
+.menu-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20%;
+}
+
+.menu-text {
+  color: #fff;
+  font-size: 1.3rem;
+  text-align: center;
+  line-height: 1.6;
+  max-width: 800px;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  margin-top: 20px;
+}

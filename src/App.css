@@ -1,0 +1,23 @@
+.app-container {
+  position: relative;
+}
+
+.app-switch-container {
+  position: absolute;
+  top: 50px;
+  right: 40px;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-menu-container {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, 50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
