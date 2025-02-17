@@ -80,10 +80,6 @@ let trajectories: THREE.Mesh[] = [];
 let planetParams: PlanetParams[] = [];
 let atmosphereParams: AtmosphereParams[] = [];
 
-function isBackgroundZoomed() {
-  return zoom;
-}
-
 // Zoom Transition function
 function BackgroundPlanetTransition(planetIndex: number) {
   if (planetIndex < 0 || planetIndex >= planetCount || zoom) {
@@ -552,8 +548,4 @@ const Background = () => {
 };
 
 export default Background;
-export {
-  BackgroundPlanetTransition,
-  BackgroundMenuTransition,
-  isBackgroundZoomed,
-};
+export { BackgroundPlanetTransition, BackgroundMenuTransition };

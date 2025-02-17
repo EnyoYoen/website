@@ -5,10 +5,20 @@ import "./Menu.css";
 
 interface MenuProps {
   callback: (button: number) => void;
+  minimizedText: string;
+  buttons: string[];
+  minimize: boolean;
+  text?: string;
 }
 
-const Menu = ({ callback }: MenuProps) => {
-  const [isMinimized, setIsMinimized] = useState(false);
+const Menu = ({
+  callback,
+  minimizedText,
+  buttons,
+  text,
+  minimize,
+}: MenuProps) => {
+  const [isMinimized, setIsMinimized] = useState(minimize);
 
   const onMinimize = () => {
     setIsMinimized(!isMinimized);
@@ -20,26 +30,21 @@ const Menu = ({ callback }: MenuProps) => {
   };
 
   if (isMinimized) {
-    return <MinimizeButton onClick={onMinimize} label="Menu" />;
+    return <MinimizeButton onClick={onMinimize} label={minimizedText} />;
   } else {
     return (
       <div className="menu-container">
         <MinimizeButton onClick={onMinimize} label="Minimize" />
         <div className="menu-content">
-          <p className="menu-text">
-            lorem ipsum dolor sit amet consectetur adipiscing elit sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim
-            ad minim veniam quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat duis aute irure dolor in
-            reprehenderit voluptate velit esse cillum dolore fugiat nulla
-            pariatur excepteur sint occaecat cupidatat non proident sunt culpa
-            qui officia deserunt mollit anim id est laborum
-          </p>
+          <p className="menu-text">{text || ""}</p>
           <div className="menu-buttons">
-            <MenuButton label="RESUME" onClick={() => onClick(1)} />
-            <MenuButton label="ABOUT ME" onClick={() => onClick(2)} />
-            <MenuButton label="SKILLS" onClick={() => onClick(3)} />
-            <MenuButton label="CONTACT" onClick={() => onClick(4)} />
+            {buttons.map((buttonLabel, index) => (
+              <MenuButton
+                key={index}
+                label={buttonLabel}
+                onClick={() => onClick(index)}
+              />
+            ))}
           </div>
         </div>
       </div>

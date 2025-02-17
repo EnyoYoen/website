@@ -3,16 +3,49 @@ import Switch from "./components/Switch";
 import Background, {
   BackgroundPlanetTransition,
   BackgroundMenuTransition,
-  isBackgroundZoomed,
 } from "./components/Background";
-import Menu from "./components/Menu";
 import "./App.css";
+import MainMenu from "./components/MainMenu";
+import SubMenu from "./components/SubMenu";
+import { useState } from "react";
+
+enum MenuEnum {
+  MAIN,
+  RESUME,
+  ABOUT_ME,
+  SKILLS,
+  CONTACT,
+  START,
+}
+
+function toString(menu: MenuEnum): string {
+  switch (menu) {
+    case MenuEnum.MAIN:
+      return "MENU";
+    case MenuEnum.RESUME:
+      return "RESUME";
+    case MenuEnum.ABOUT_ME:
+      return "ABOUT ME";
+    case MenuEnum.SKILLS:
+      return "SKILLS";
+    case MenuEnum.CONTACT:
+      return "CONTACT";
+    default:
+      return "";
+  }
+}
 
 function App() {
+  const [menu, setMenu] = useState<MenuEnum>(MenuEnum.START);
+
   const callback = (button: number) => {
-    // TODO: just a placeholder to see if the menu transitions works
-    if (isBackgroundZoomed()) BackgroundMenuTransition();
-    else BackgroundPlanetTransition(button);
+    if (button === -1) {
+      setMenu(MenuEnum.MAIN);
+      BackgroundMenuTransition();
+    } else {
+      setMenu((button + 1) as MenuEnum);
+      BackgroundPlanetTransition(button);
+    }
   };
 
   return (
@@ -23,7 +56,15 @@ function App() {
           <Switch></Switch>
         </div>
         <div className="app-menu-container">
-          <Menu callback={callback} />
+          {menu === MenuEnum.START || menu === MenuEnum.MAIN ? (
+            <MainMenu callback={callback} start={menu === MenuEnum.START} />
+          ) : (
+            <SubMenu
+              callback={() => callback(-1)}
+              minimizedText={toString(menu)}
+              text="lorem ipsum dolor sit amet consectetur adipiscing elit sed do"
+            ></SubMenu>
+          )}
         </div>
       </div>
       <Footer></Footer>
