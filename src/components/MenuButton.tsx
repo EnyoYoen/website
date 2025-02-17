@@ -8,10 +8,8 @@ interface MenuButtonProps {
 
 const MenuButton: React.FC<MenuButtonProps> = ({ onClick, label }) => {
   return (
-    <div className="menu-button-anim">
-      <button onClick={onClick} className="menu-button">
-        {label}
-      </button>
+    <div onClick={onClick} className="menu-button-anim">
+      <button className="menu-button">{label}</button>
     </div>
   );
 };

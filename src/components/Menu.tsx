@@ -3,15 +3,20 @@ import MinimizeButton from "./MinimizeButton";
 import { useState } from "react";
 import "./Menu.css";
 
-const Menu = () => {
-  const onClick = () => {
-    console.log("Button clicked"); // TODO
-  };
+interface MenuProps {
+  callback: (button: number) => void;
+}
 
+const Menu = ({ callback }: MenuProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
 
   const onMinimize = () => {
     setIsMinimized(!isMinimized);
+  };
+
+  const onClick = (button: number) => {
+    setIsMinimized(true);
+    callback(button);
   };
 
   if (isMinimized) {
@@ -31,10 +36,10 @@ const Menu = () => {
             qui officia deserunt mollit anim id est laborum
           </p>
           <div className="menu-buttons">
-            <MenuButton label="RESUME" onClick={onClick} />
-            <MenuButton label="ABOUT ME" onClick={onClick} />
-            <MenuButton label="SKILLS" onClick={onClick} />
-            <MenuButton label="CONTACT" onClick={onClick} />
+            <MenuButton label="RESUME" onClick={() => onClick(1)} />
+            <MenuButton label="ABOUT ME" onClick={() => onClick(2)} />
+            <MenuButton label="SKILLS" onClick={() => onClick(3)} />
+            <MenuButton label="CONTACT" onClick={() => onClick(4)} />
           </div>
         </div>
       </div>

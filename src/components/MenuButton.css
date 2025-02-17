@@ -71,6 +71,7 @@
 	transition: all .7s ease;
 	animation: grow 1s infinite;
 }*/
+
 @keyframes grow {
   from {
     transform: scale(0, 0);

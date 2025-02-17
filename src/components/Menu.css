@@ -4,7 +4,7 @@
   background-repeat: no-repeat;
   width: 100%;
   height: auto;
-  aspect-ratio: 3059 / 2392; /* Hardcoded values, coming from the textbox.svg */
+  aspect-ratio: 3059 / 2392; /* Hardcoded values, taken from the textbox.svg */
   opacity: 0.75;
   padding: 0% 15% 15% 10%;
 }
