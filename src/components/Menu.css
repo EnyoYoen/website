@@ -37,3 +37,32 @@
   gap: 30px;
   margin-top: 20px;
 }
+
+.menu-container.menu-projects .menu-content {
+  padding-top: 25%;
+}
+
+.menu-container.menu-projects .menu-buttons {
+  width: min(600px, 100%);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(110px, 1fr));
+  gap: 14px 18px;
+  justify-items: center;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.menu-container.menu-projects .menu-button {
+  width: 130px;
+}
+
+.menu-container.menu-projects .menu-buttons > :last-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+@media (max-width: 860px) {
+  .menu-container.menu-projects .menu-buttons {
+    grid-template-columns: repeat(1, minmax(110px, 1fr));
+  }
+}

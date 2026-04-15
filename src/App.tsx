@@ -79,6 +79,7 @@ function App() {
                 }
               }}
               minimizeOnClick={false}
+              className="menu-projects"
             ></SubMenu>
           ) : (
             <SubMenu

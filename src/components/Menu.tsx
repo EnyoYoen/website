@@ -12,6 +12,7 @@ interface MenuProps {
   onButtonHover?: (button: number) => void;
   onButtonLeave?: (button: number) => void;
   minimizeOnClick?: boolean;
+  className?: string;
 }
 
 const Menu = ({
@@ -23,6 +24,7 @@ const Menu = ({
   onButtonHover,
   onButtonLeave,
   minimizeOnClick = true,
+  className,
 }: MenuProps) => {
   const [isMinimized, setIsMinimized] = useState(minimize);
 
@@ -41,7 +43,7 @@ const Menu = ({
     return <MinimizeButton onClick={onMinimize} label={minimizedText} />;
   } else {
     return (
-      <div className="menu-container">
+      <div className={`menu-container${className ? ` ${className}` : ""}`}>
         <MinimizeButton onClick={onMinimize} label="Minimize" />
         <div className="menu-content">
           <p className="menu-text">{text || ""}</p>
