@@ -85,13 +85,9 @@ let proceduralPlanet: THREE.Mesh | null = null;
 let oceanSphere: THREE.Mesh | null = null;
 let zoomedPlanetIndex: number | null = null;
 let projectPins: THREE.Mesh[] = [];
+let projectPinDirections: THREE.Vector3[] = [];
 
-const projectPinDirections = [
-  new THREE.Vector3(0.35, 0.45, 0.82).normalize(),
-  new THREE.Vector3(-0.68, 0.22, 0.7).normalize(),
-  new THREE.Vector3(0.72, -0.18, 0.67).normalize(),
-  new THREE.Vector3(-0.28, -0.62, 0.73).normalize(),
-];
+const projectPinCount = 4;
 
 function pseudoRandom(seed: number) {
   const x = Math.sin(seed * 91.3458) * 43758.5453;
@@ -142,6 +138,68 @@ function clearProjectPins() {
   projectPins = [];
 }
 
+function generateRandomProjectPinDirections(count: number) {
+  const candidateCount = 512;
+  const candidates: THREE.Vector3[] = [];
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+  for (let i = 0; i < candidateCount; i++) {
+    const y = 1 - (i / (candidateCount - 1)) * 2;
+    const r = Math.sqrt(Math.max(0, 1 - y * y));
+    const theta = goldenAngle * i;
+    candidates.push(new THREE.Vector3(Math.cos(theta) * r, y, Math.sin(theta) * r));
+  }
+
+  const directions: THREE.Vector3[] = [];
+  const selected = new Set<number>();
+
+  const firstIndex = Math.floor(Math.random() * candidateCount);
+  selected.add(firstIndex);
+  directions.push(candidates[firstIndex].clone());
+
+  while (directions.length < count && selected.size < candidateCount) {
+    const weights: Array<{ idx: number; weight: number }> = [];
+    let totalWeight = 0;
+
+    for (let i = 0; i < candidateCount; i++) {
+      if (selected.has(i)) {
+        continue;
+      }
+
+      let minDistSq = Number.POSITIVE_INFINITY;
+      for (let j = 0; j < directions.length; j++) {
+        const distSq = candidates[i].distanceToSquared(directions[j]);
+        if (distSq < minDistSq) {
+          minDistSq = distSq;
+        }
+      }
+
+      const weight = Math.pow(minDistSq + 1e-6, 1.5);
+      totalWeight += weight;
+      weights.push({ idx: i, weight });
+    }
+
+    let pick = Math.random() * totalWeight;
+    let chosenIndex = -1;
+    for (let i = 0; i < weights.length; i++) {
+      pick -= weights[i].weight;
+      if (pick <= 0) {
+        chosenIndex = weights[i].idx;
+        break;
+      }
+    }
+
+    if (chosenIndex < 0) {
+      chosenIndex = weights[weights.length - 1].idx;
+    }
+
+    selected.add(chosenIndex);
+    directions.push(candidates[chosenIndex].clone());
+  }
+
+  return directions;
+}
+
 function createProjectPins(planetIndex: number) {
   if (!proceduralPlanet) {
     return;
@@ -160,6 +218,7 @@ function createProjectPins(planetIndex: number) {
   const planetTint = planetParams[planetIndex].color3.value.clone();
   const redAnchor = new THREE.Color(0xd63f4f);
   const emissiveAnchor = new THREE.Color(0xff4e5f);
+  projectPinDirections = generateRandomProjectPinDirections(projectPinCount);
 
   for (let i = 0; i < projectPinDirections.length; i++) {
     const normal = projectPinDirections[i].clone().normalize();
