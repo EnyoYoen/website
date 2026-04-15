@@ -3,6 +3,7 @@ import Switch from "./components/Switch";
 import Background, {
   BackgroundPlanetTransition,
   BackgroundMenuTransition,
+  BackgroundFocusProjectPin,
 } from "./components/Background";
 import "./App.css";
 import MainMenu from "./components/MainMenu";
@@ -15,6 +16,7 @@ enum MenuEnum {
   ABOUT_ME,
   SKILLS,
   CONTACT,
+  PROJECTS,
   START,
 }
 
@@ -30,6 +32,8 @@ function toString(menu: MenuEnum): string {
       return "SKILLS";
     case MenuEnum.CONTACT:
       return "CONTACT";
+    case MenuEnum.PROJECTS:
+      return "PROJECTS";
     default:
       return "";
   }
@@ -37,6 +41,7 @@ function toString(menu: MenuEnum): string {
 
 function App() {
   const [menu, setMenu] = useState<MenuEnum>(MenuEnum.START);
+  const projectButtons = ["PROJECT A", "PROJECT B", "PROJECT C", "PROJECT D", "BACK"];
 
   const callback = (button: number) => {
     if (button === -1) {
@@ -58,6 +63,23 @@ function App() {
         <div className="app-menu-container">
           {menu === MenuEnum.START || menu === MenuEnum.MAIN ? (
             <MainMenu callback={callback} start={menu === MenuEnum.START} />
+          ) : menu === MenuEnum.PROJECTS ? (
+            <SubMenu
+              callback={(button) => {
+                if (button === projectButtons.length - 1) {
+                  callback(-1);
+                }
+              }}
+              minimizedText={toString(menu)}
+              text="Hover a project button to rotate the planet and center its pin."
+              buttons={projectButtons}
+              onButtonHover={(button) => {
+                if (button < projectButtons.length - 1) {
+                  BackgroundFocusProjectPin(button);
+                }
+              }}
+              minimizeOnClick={false}
+            ></SubMenu>
           ) : (
             <SubMenu
               callback={() => callback(-1)}

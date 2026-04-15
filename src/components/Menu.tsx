@@ -9,6 +9,9 @@ interface MenuProps {
   buttons: string[];
   minimize: boolean;
   text?: string;
+  onButtonHover?: (button: number) => void;
+  onButtonLeave?: (button: number) => void;
+  minimizeOnClick?: boolean;
 }
 
 const Menu = ({
@@ -17,6 +20,9 @@ const Menu = ({
   buttons,
   text,
   minimize,
+  onButtonHover,
+  onButtonLeave,
+  minimizeOnClick = true,
 }: MenuProps) => {
   const [isMinimized, setIsMinimized] = useState(minimize);
 
@@ -25,7 +31,9 @@ const Menu = ({
   };
 
   const onClick = (button: number) => {
-    setIsMinimized(true);
+    if (minimizeOnClick) {
+      setIsMinimized(true);
+    }
     callback(button);
   };
 
@@ -43,6 +51,8 @@ const Menu = ({
                 key={index}
                 label={buttonLabel}
                 onClick={() => onClick(index)}
+                onHover={() => onButtonHover?.(index)}
+                onLeave={() => onButtonLeave?.(index)}
               />
             ))}
           </div>

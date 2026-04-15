@@ -63,6 +63,7 @@ interface AtmosphereParams {
 
 // Global variables for transitions
 const planetCount = 5;
+const projectsPlanetIndex = 4;
 
 let zoom = false;
 let timeOffset = 0;
@@ -83,6 +84,14 @@ let oceanColors: THREE.Color[] = [];
 let proceduralPlanet: THREE.Mesh | null = null;
 let oceanSphere: THREE.Mesh | null = null;
 let zoomedPlanetIndex: number | null = null;
+let projectPins: THREE.Mesh[] = [];
+
+const projectPinDirections = [
+  new THREE.Vector3(0.35, 0.45, 0.82).normalize(),
+  new THREE.Vector3(-0.68, 0.22, 0.7).normalize(),
+  new THREE.Vector3(0.72, -0.18, 0.67).normalize(),
+  new THREE.Vector3(-0.28, -0.62, 0.73).normalize(),
+];
 
 function pseudoRandom(seed: number) {
   const x = Math.sin(seed * 91.3458) * 43758.5453;
@@ -116,6 +125,102 @@ function generatePlanetPalette(index: number) {
     ocean,
     layers: [layer1, layer2, layer3, layer4, layer5] as const,
   };
+}
+
+function clearProjectPins() {
+  if (!proceduralPlanet) {
+    projectPins = [];
+    return;
+  }
+
+  for (let i = 0; i < projectPins.length; i++) {
+    const pin = projectPins[i];
+    proceduralPlanet.remove(pin);
+    pin.geometry.dispose();
+    (pin.material as THREE.Material).dispose();
+  }
+  projectPins = [];
+}
+
+function createProjectPins(planetIndex: number) {
+  if (!proceduralPlanet) {
+    return;
+  }
+
+  clearProjectPins();
+
+  const radius = planetParams[planetIndex].radius.value;
+  const maxTerrainHeight = Math.max(
+    0,
+    planetParams[planetIndex].amplitude.value +
+      planetParams[planetIndex].offset.value
+  );
+  const seaLevelRadius = radius + maxTerrainHeight * 0.4;
+  const pinDistance = seaLevelRadius + 0.003;
+  const planetTint = planetParams[planetIndex].color3.value.clone();
+  const redAnchor = new THREE.Color(0xd63f4f);
+  const emissiveAnchor = new THREE.Color(0xff4e5f);
+
+  for (let i = 0; i < projectPinDirections.length; i++) {
+    const normal = projectPinDirections[i].clone().normalize();
+    const variation = i / Math.max(1, projectPinDirections.length - 1);
+    const pinColor = planetTint.clone().lerp(redAnchor, 0.58 + variation * 0.12);
+    const pinEmissive = pinColor.clone().lerp(emissiveAnchor, 0.55);
+
+    const pinGeometry = new THREE.ConeGeometry(0.08, 0.42, 14);
+    pinGeometry.rotateX(Math.PI);
+    pinGeometry.translate(0, 0.21, 0);
+    const pin = new THREE.Mesh(
+      pinGeometry,
+      new THREE.MeshStandardMaterial({
+        color: pinColor,
+        emissive: pinEmissive,
+        emissiveIntensity: 2.2,
+        roughness: 0.2,
+        metalness: 0.25,
+        depthWrite: false,
+      })
+    );
+    pin.position.copy(normal.clone().multiplyScalar(pinDistance));
+    pin.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+    proceduralPlanet.add(pin);
+    projectPins.push(pin);
+  }
+}
+
+function BackgroundFocusProjectPin(projectIndex: number) {
+  if (
+    !zoom ||
+    zoomedPlanetIndex !== projectsPlanetIndex ||
+    !proceduralPlanet ||
+    projectIndex < 0 ||
+    projectIndex >= projectPinDirections.length
+  ) {
+    return;
+  }
+
+  const currentQuat = proceduralPlanet.quaternion.clone();
+  const pinDirection = projectPinDirections[projectIndex].clone();
+  const worldPinDirection = pinDirection.applyQuaternion(currentQuat).normalize();
+  const targetDirection = camera.position
+    .clone()
+    .sub(proceduralPlanet.position)
+    .normalize();
+  const delta = new THREE.Quaternion().setFromUnitVectors(
+    worldPinDirection,
+    targetDirection
+  );
+  const targetQuat = delta.multiply(currentQuat);
+
+  const anim = { t: 0 };
+  gsap.to(anim, {
+    duration: 0.8,
+    t: 1,
+    ease: "power2.inOut",
+    onUpdate: () => {
+      proceduralPlanet?.quaternion.slerpQuaternions(currentQuat, targetQuat, anim.t);
+    },
+  });
 }
 
 // Zoom Transition function
@@ -167,6 +272,10 @@ function BackgroundPlanetTransition(planetIndex: number) {
   proceduralPlanet.geometry.computeTangents();
   proceduralPlanet.position.copy(targetPosition);
   scene.add(proceduralPlanet);
+
+  if (planetIndex === projectsPlanetIndex) {
+    createProjectPins(planetIndex);
+  }
 
   const baseRadius = planetParams[planetIndex].radius.value;
   const maxTerrainHeight = Math.max(
@@ -252,6 +361,7 @@ function BackgroundMenuTransition() {
   }
 
   if (proceduralPlanet) {
+    clearProjectPins();
     scene.remove(proceduralPlanet);
     proceduralPlanet.geometry.dispose();
     (proceduralPlanet.material as THREE.Material).dispose();
@@ -468,8 +578,13 @@ const Background = () => {
 
         distance += (2 + (Math.random() * 5 + scale)) * 0.6;
         const angle = Math.random() * Math.PI * 2;
-        const angleVelocity = Math.random() * 0.01 + 0.01;
+        let angleVelocity = Math.random() * 0.01 + 0.01;
         scale = Math.random() * 0.5 + 0.5;
+
+        if (i === projectsPlanetIndex) {
+          scale = 1.25;
+          angleVelocity = 0.006;
+        }
 
         planet.position.set(
           Math.cos(angle) * distance,
@@ -640,4 +755,8 @@ const Background = () => {
 };
 
 export default Background;
-export { BackgroundPlanetTransition, BackgroundMenuTransition };
+export {
+  BackgroundPlanetTransition,
+  BackgroundMenuTransition,
+  BackgroundFocusProjectPin,
+};
