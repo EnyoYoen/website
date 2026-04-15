@@ -79,6 +79,44 @@ let planets: {
 let trajectories: THREE.Mesh[] = [];
 let planetParams: PlanetParams[] = [];
 let atmosphereParams: AtmosphereParams[] = [];
+let oceanColors: THREE.Color[] = [];
+let proceduralPlanet: THREE.Mesh | null = null;
+let oceanSphere: THREE.Mesh | null = null;
+let zoomedPlanetIndex: number | null = null;
+
+function pseudoRandom(seed: number) {
+  const x = Math.sin(seed * 91.3458) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function makeHslColor(h: number, s: number, l: number) {
+  return new THREE.Color().setHSL(
+    ((h % 1) + 1) % 1,
+    THREE.MathUtils.clamp(s, 0, 1),
+    THREE.MathUtils.clamp(l, 0, 1)
+  );
+}
+
+function generatePlanetPalette(index: number) {
+  const h = pseudoRandom(index + 1.37);
+  const hueDrift = pseudoRandom(index + 4.91) * 0.1 - 0.05;
+  const satBoost = 0.08 + pseudoRandom(index + 7.2) * 0.12;
+  const lightJitter = pseudoRandom(index + 3.1) * 0.05;
+
+  const layer1 = makeHslColor(h - 0.08 + hueDrift, 0.5 + satBoost, 0.14 + lightJitter * 0.4);
+  const layer2 = makeHslColor(h - 0.03, 0.62 + satBoost * 0.7, 0.26 + lightJitter * 0.6);
+  const layer3 = makeHslColor(h + 0.02, 0.7 + satBoost * 0.6, 0.4 + lightJitter * 0.8);
+  const layer4 = makeHslColor(h + 0.06, 0.56 + satBoost * 0.35, 0.58 + lightJitter);
+  const layer5 = makeHslColor(h + 0.1, 0.22 + satBoost * 0.15, 0.82 + lightJitter * 0.8);
+
+  const oceanHue = h - 0.14 + hueDrift * 0.5;
+  const ocean = makeHslColor(oceanHue, 0.72 + satBoost * 0.4, 0.3 + lightJitter * 0.35);
+
+  return {
+    ocean,
+    layers: [layer1, layer2, layer3, layer4, layer5] as const,
+  };
+}
 
 // Zoom Transition function
 function BackgroundPlanetTransition(planetIndex: number) {
@@ -91,6 +129,7 @@ function BackgroundPlanetTransition(planetIndex: number) {
 
   const targetPlanet = planets[planetIndex].planet;
   const targetPosition = targetPlanet.position.clone();
+  zoomedPlanetIndex = planetIndex;
 
   camera.lookAt(targetPosition);
   camera.updateProjectionMatrix();
@@ -102,7 +141,7 @@ function BackgroundPlanetTransition(planetIndex: number) {
   controls.target.copy(targetPosition);
   controls.update();
 
-  /*let planetVertexShader = planetVert;
+  let planetVertexShader = planetVert;
   let planetFragmentShader = planetFrag;
   planetVertexShader = planetVertexShader.replace(
     "void main(){",
@@ -121,13 +160,35 @@ function BackgroundPlanetTransition(planetIndex: number) {
     fragmentShader: planetFragmentShader,
   });
 
-  const proceduralPlanet = new THREE.Mesh(
+  proceduralPlanet = new THREE.Mesh(
     new THREE.SphereGeometry(1, 128, 128),
     material
   );
   proceduralPlanet.geometry.computeTangents();
   proceduralPlanet.position.copy(targetPosition);
-  scene.add(proceduralPlanet);*/
+  scene.add(proceduralPlanet);
+
+  const baseRadius = planetParams[planetIndex].radius.value;
+  const maxTerrainHeight = Math.max(
+    0,
+    planetParams[planetIndex].amplitude.value +
+      planetParams[planetIndex].offset.value
+  );
+  const seaLevelRadius = baseRadius + maxTerrainHeight * 0.4;
+  oceanSphere = new THREE.Mesh(
+    new THREE.SphereGeometry(seaLevelRadius, 96, 96),
+    new THREE.MeshStandardMaterial({
+      color: oceanColors[planetIndex] ?? new THREE.Color(0.08, 0.34, 0.78),
+      transparent: true,
+      opacity: 0.45,
+      roughness: 0.08,
+      metalness: 0.05,
+      depthWrite: false,
+    })
+  );
+  oceanSphere.position.copy(targetPosition);
+  scene.add(oceanSphere);
+  targetPlanet.visible = false;
 
   for (let i = 0; i < trajectories.length; i++) {
     gsap.to(trajectories[i].material, {
@@ -184,6 +245,25 @@ function BackgroundPlanetTransition(planetIndex: number) {
 function BackgroundMenuTransition() {
   zoom = false;
   timeOffset += performance.now() - transitionTime;
+
+  if (zoomedPlanetIndex !== null) {
+    planets[zoomedPlanetIndex].planet.visible = true;
+    zoomedPlanetIndex = null;
+  }
+
+  if (proceduralPlanet) {
+    scene.remove(proceduralPlanet);
+    proceduralPlanet.geometry.dispose();
+    (proceduralPlanet.material as THREE.Material).dispose();
+    proceduralPlanet = null;
+  }
+
+  if (oceanSphere) {
+    scene.remove(oceanSphere);
+    oceanSphere.geometry.dispose();
+    (oceanSphere.material as THREE.Material).dispose();
+    oceanSphere = null;
+  }
 
   controls.enableZoom = true;
   controls.enablePan = true;
@@ -373,10 +453,14 @@ const Background = () => {
 
       let distance = 5;
       let scale = 1;
+      oceanColors = [];
 
       for (let i = 0; i < planetCount; i++) {
-        const color = new THREE.Color();
-        color.setHSL(Math.random(), 0.7, Math.random() * 0.2 + 0.05);
+        const palette = generatePlanetPalette(i);
+        const [layer1, layer2, layer3, layer4, layer5] = palette.layers;
+        oceanColors.push(palette.ocean.clone());
+
+        const color = layer3.clone();
         const material = new THREE.MeshStandardMaterial({ color: color });
         const planet = new THREE.Mesh(geometry, material);
         planet.castShadow = true;
@@ -399,8 +483,8 @@ const Background = () => {
         planetParams.push({
           type: { value: 2 },
           radius: { value: scale },
-          amplitude: { value: 1.19 },
-          sharpness: { value: 2.6 },
+          amplitude: { value: 0.59 },
+          sharpness: { value: 0.96 },
           offset: { value: -0.016 },
           period: { value: 0.6 },
           persistence: { value: 0.484 },
@@ -415,31 +499,39 @@ const Background = () => {
           lightColor: { value: new THREE.Color(0xffffff) },
           bumpStrength: { value: 1.0 },
           bumpOffset: { value: 0.001 },
-          color1: { value: new THREE.Color(0.014, 0.117, 0.279) },
-          color2: { value: new THREE.Color(0.08, 0.527, 0.351) },
-          color3: { value: new THREE.Color(0.62, 0.516, 0.372) },
-          color4: { value: new THREE.Color(0.149, 0.254, 0.084) },
-          color5: { value: new THREE.Color(0.15, 0.15, 0.15) },
-          transition2: { value: 0.071 },
-          transition3: { value: 0.215 },
-          transition4: { value: 0.372 },
-          transition5: { value: 1.2 },
-          blend12: { value: 0.152 },
-          blend23: { value: 0.152 },
-          blend34: { value: 0.104 },
-          blend45: { value: 0.168 },
+          color1: { value: layer1.clone() },
+          color2: { value: layer2.clone() },
+          color3: { value: layer3.clone() },
+          color4: { value: layer4.clone() },
+          color5: { value: layer5.clone() },
+          transition2: { value: 0.075 },
+          transition3: { value: 0.18 },
+          transition4: { value: 0.34 },
+          transition5: { value: 0.62 },
+          blend12: { value: 0.03 },
+          blend23: { value: 0.045 },
+          blend34: { value: 0.055 },
+          blend45: { value: 0.065 },
         });
 
         atmosphereParams.push({
           particles: { value: 4000 },
           minParticleSize: { value: 50 },
           maxParticleSize: { value: 100 },
-          radius: { value: planetParams[i].radius.value + 1 },
+          radius: {
+            value:
+              planetParams[i].radius.value +
+              Math.max(
+                0,
+                planetParams[i].amplitude.value + planetParams[i].offset.value
+              ) +
+              0.16,
+          },
           thickness: { value: 1.5 },
           density: { value: 0 },
-          opacity: { value: 0.35 },
+          opacity: { value: 0.2 },
           scale: { value: 8 },
-          color: { value: new THREE.Color(0xffffff) },
+          color: { value: new THREE.Color(0.45, 0.72, 1.0) },
           speed: { value: 0.03 },
           lightDirection: planetParams[i].lightDirection,
         });
