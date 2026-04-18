@@ -9,7 +9,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="fixed bottom-0 left-0 z-20 w-full p-4 bg-white border-t border-gray-200 shadow-sm md:p-6 dark:bg-gray-700 dark:border-gray-600 flex justify-center items-center">
+    <footer className="fixed bottom-0 left-0 z-20 w-full p-2 bg-white border-t border-gray-200 shadow-sm dark:bg-gray-700 dark:border-gray-600 flex justify-center items-center">
       <div className="flex space-x-4">
         {Object.keys(icons).map((icon) => (
           <FooterIcon
