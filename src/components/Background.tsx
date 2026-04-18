@@ -721,17 +721,12 @@ const Background = ({ darkMode }: BackgroundProps) => {
           lightDirection: planetParams[i].lightDirection,
         });
 
-        const ringGeometry = new THREE.RingGeometry(
-          distance - 0.04,
-          distance + 0.04,
-          64
-        );
+        const ringGeometry = new THREE.TorusGeometry(distance, 0.04, 12, 128);
         const ringMaterial = new THREE.MeshBasicMaterial({
           color: 0xaaaaaa,
-          side: THREE.DoubleSide,
         });
         const trajectory = new THREE.Mesh(ringGeometry, ringMaterial);
-        trajectory.rotation.x = -Math.PI / 2;
+        trajectory.rotation.x = Math.PI / 2;
         trajectories.push(trajectory);
 
         const canvas = document.createElement("canvas");
