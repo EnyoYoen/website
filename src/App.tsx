@@ -10,7 +10,7 @@ import MainMenu from "./components/MainMenu";
 import SubMenu from "./components/SubMenu";
 import { useEffect, useRef, useState } from "react";
 
-enum MenuEnum {
+export enum MenuEnum {
   MAIN,
   RESUME,
   ABOUT_ME,
@@ -98,6 +98,7 @@ function App() {
                   callback(-1);
                 }
               }}
+              menu={menu}
               minimizedText={toString(menu)}
               text="Hover a project button to rotate the planet and center its pin."
               buttons={projectButtons}
@@ -113,6 +114,7 @@ function App() {
           ) : (
             <SubMenu
               callback={() => callback(-1)}
+              menu={menu}
               minimizedText={toString(menu)}
               text="lorem ipsum dolor sit amet consectetur adipiscing elit sed do"
               minimize={isSubMenuMinimized}

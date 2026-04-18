@@ -1,0 +1,75 @@
+.resume-preview-button {
+  appearance: none;
+  border: 1px solid rgba(130, 226, 255, 0.42);
+  background: linear-gradient(145deg, rgba(8, 34, 54, 0.96), rgba(5, 18, 29, 0.96));
+  color: #d6f3ff;
+  border-radius: 16px;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-family: "Roboto", sans-serif;
+  box-shadow:
+    0 0 0 1px rgba(95, 213, 255, 0.12) inset,
+    0 10px 24px rgba(4, 18, 35, 0.28);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.resume-preview-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(160, 232, 255, 0.75);
+  box-shadow:
+    0 0 0 1px rgba(95, 213, 255, 0.2) inset,
+    0 14px 30px rgba(4, 18, 35, 0.4),
+    0 0 20px rgba(60, 184, 255, 0.16);
+}
+
+.resume-preview-button.active {
+  border-color: rgba(88, 255, 208, 0.8);
+  box-shadow:
+    0 0 0 1px rgba(88, 255, 208, 0.14) inset,
+    0 0 24px rgba(88, 255, 208, 0.18),
+    0 14px 30px rgba(4, 18, 35, 0.38);
+}
+
+.resume-preview-button-orb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #8be9ff 30%, #1da4ff 70%, #06335a 100%);
+  box-shadow: 0 0 14px rgba(83, 206, 255, 0.42);
+}
+
+.resume-preview-button.active .resume-preview-button-orb {
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #9dffd9 30%, #22ddb2 70%, #064f42 100%);
+  box-shadow: 0 0 16px rgba(88, 255, 208, 0.52);
+}
+
+.resume-preview-button-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.resume-preview-button-label {
+  font-size: 0.9rem;
+  font-family: "Roboto", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.resume-preview-button-subtitle {
+  margin-top: 3px;
+  font-size: 0.68rem;
+  font-family: "Roboto", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(214, 243, 255, 0.7);
+}

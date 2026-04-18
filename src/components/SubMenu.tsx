@@ -1,4 +1,6 @@
 import Menu from "./Menu";
+import ResumeMenu from "./ResumeMenu";
+import { MenuEnum } from "../App";
 
 interface SubMenuProps {
   callback: (button: number) => void;
@@ -10,6 +12,7 @@ interface SubMenuProps {
   minimizeOnClick?: boolean;
   className?: string;
   minimize?: boolean;
+  menu: MenuEnum;
 }
 
 const SubMenu = ({
@@ -22,19 +25,32 @@ const SubMenu = ({
   minimizeOnClick,
   className,
   minimize,
+  menu,
 }: SubMenuProps) => {
   return (
-    <Menu
-      callback={callback}
-      minimizedText={minimizedText}
-      buttons={buttons ?? ["BACK"]}
-      text={text}
-      minimize={minimize ?? false}
-      onButtonHover={onButtonHover}
-      onButtonLeave={onButtonLeave}
-      minimizeOnClick={minimizeOnClick}
-      className={className}
-    />
+    menu === MenuEnum.RESUME ? (
+      <ResumeMenu
+        callback={callback}
+        minimizedText={minimizedText}
+        minimize={minimize ?? false}
+        text={text}
+        minimizeOnClick={minimizeOnClick}
+        className={className}
+        menu={menu}
+      />
+    ) : (
+      <Menu
+        callback={callback}
+        minimizedText={minimizedText}
+        buttons={buttons ?? ["BACK"]}
+        text={text}
+        minimize={minimize ?? false}
+        onButtonHover={onButtonHover}
+        onButtonLeave={onButtonLeave}
+        minimizeOnClick={minimizeOnClick}
+        className={className}
+      />
+    )
   );
 };
 
