@@ -8,7 +8,7 @@ import Background, {
 import "./App.css";
 import MainMenu from "./components/MainMenu";
 import SubMenu from "./components/SubMenu";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 enum MenuEnum {
   MAIN,
@@ -41,15 +41,43 @@ function toString(menu: MenuEnum): string {
 
 function App() {
   const [menu, setMenu] = useState<MenuEnum>(MenuEnum.START);
+  const [isSubMenuMinimized, setIsSubMenuMinimized] = useState(false);
+  const submenuOpenTimeoutRef = useRef<number | null>(null);
   const projectButtons = ["PROJECT A", "PROJECT B", "PROJECT C", "PROJECT D", "BACK"];
+
+  const scheduleSubMenuReopen = () => {
+    if (submenuOpenTimeoutRef.current !== null) {
+      window.clearTimeout(submenuOpenTimeoutRef.current);
+    }
+
+    setIsSubMenuMinimized(true);
+    submenuOpenTimeoutRef.current = window.setTimeout(() => {
+      setIsSubMenuMinimized(false);
+      submenuOpenTimeoutRef.current = null;
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (submenuOpenTimeoutRef.current !== null) {
+        window.clearTimeout(submenuOpenTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const callback = (button: number) => {
     if (button === -1) {
+      if (submenuOpenTimeoutRef.current !== null) {
+        window.clearTimeout(submenuOpenTimeoutRef.current);
+        submenuOpenTimeoutRef.current = null;
+      }
+      setIsSubMenuMinimized(false);
       setMenu(MenuEnum.MAIN);
       BackgroundMenuTransition();
     } else {
       setMenu((button + 1) as MenuEnum);
       BackgroundPlanetTransition(button);
+      scheduleSubMenuReopen();
     }
   };
 
@@ -80,12 +108,14 @@ function App() {
               }}
               minimizeOnClick={false}
               className="menu-projects"
+              minimize={isSubMenuMinimized}
             ></SubMenu>
           ) : (
             <SubMenu
               callback={() => callback(-1)}
               minimizedText={toString(menu)}
               text="lorem ipsum dolor sit amet consectetur adipiscing elit sed do"
+              minimize={isSubMenuMinimized}
             ></SubMenu>
           )}
         </div>

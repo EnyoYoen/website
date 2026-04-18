@@ -1,6 +1,6 @@
 import MenuButton from "./MenuButton";
 import MinimizeButton from "./MinimizeButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./Menu.css";
 
 interface MenuProps {
@@ -27,6 +27,10 @@ const Menu = ({
   className,
 }: MenuProps) => {
   const [isMinimized, setIsMinimized] = useState(minimize);
+
+  useEffect(() => {
+    setIsMinimized(minimize);
+  }, [minimize]);
 
   const onMinimize = () => {
     setIsMinimized(!isMinimized);

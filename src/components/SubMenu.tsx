@@ -9,6 +9,7 @@ interface SubMenuProps {
   onButtonLeave?: (button: number) => void;
   minimizeOnClick?: boolean;
   className?: string;
+  minimize?: boolean;
 }
 
 const SubMenu = ({
@@ -20,6 +21,7 @@ const SubMenu = ({
   onButtonLeave,
   minimizeOnClick,
   className,
+  minimize,
 }: SubMenuProps) => {
   return (
     <Menu
@@ -27,7 +29,7 @@ const SubMenu = ({
       minimizedText={minimizedText}
       buttons={buttons ?? ["BACK"]}
       text={text}
-      minimize={true}
+      minimize={minimize ?? false}
       onButtonHover={onButtonHover}
       onButtonLeave={onButtonLeave}
       minimizeOnClick={minimizeOnClick}

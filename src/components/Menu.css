@@ -7,6 +7,8 @@
   aspect-ratio: 3059 / 2392; /* Hardcoded values, taken from the textbox.svg */
   opacity: 0.75;
   padding: 0% 15% 15% 10%;
+  transform-origin: 50% 65%;
+  animation: menu-open 420ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
 }
 
 .menu-container .minimize-button {
@@ -36,6 +38,25 @@
   flex-direction: row;
   gap: 30px;
   margin-top: 20px;
+}
+
+@keyframes menu-open {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.975);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 0.75;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-container {
+    animation: none;
+  }
 }
 
 .menu-container.menu-projects .menu-content {
