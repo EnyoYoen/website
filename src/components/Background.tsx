@@ -63,7 +63,7 @@ interface AtmosphereParams {
 
 // Global variables for transitions
 const planetCount = 5;
-const projectsPlanetIndex = 4;
+const projectsPlanetIndex = 1;
 
 let zoom = false;
 let timeOffset = 0;
@@ -86,6 +86,9 @@ let oceanSphere: THREE.Mesh | null = null;
 let zoomedPlanetIndex: number | null = null;
 let projectPins: THREE.Mesh[] = [];
 let projectPinDirections: THREE.Vector3[] = [];
+let sunMesh: THREE.Mesh | null = null;
+let mainLight: THREE.PointLight | null = null;
+let fillAmbientLight: THREE.AmbientLight | null = null;
 
 const projectPinCount = 4;
 
@@ -476,7 +479,11 @@ function BackgroundMenuTransition() {
 }
 
 // Background component with Three.js
-const Background = () => {
+interface BackgroundProps {
+  darkMode: boolean;
+}
+
+const Background = ({ darkMode }: BackgroundProps) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -598,9 +605,11 @@ const Background = () => {
       const light = new THREE.PointLight(color, intensity);
       light.castShadow = true;
       scene.add(light);
+      mainLight = light;
 
       const ambientLight = new THREE.AmbientLight(0x606060, 3); // soft white light
       scene.add(ambientLight);
+      fillAmbientLight = ambientLight;
 
       const geometry = new THREE.IcosahedronGeometry(1, 15);
 
@@ -617,6 +626,7 @@ const Background = () => {
       sun.scale.setScalar(3);
       sun.layers.enable(BLOOM_SCENE);
       scene.add(sun);
+      sunMesh = sun;
 
       const labels = ["Mercury", "Venus", "Earth", "Mars", "Jupiter"];
 
@@ -625,7 +635,8 @@ const Background = () => {
       oceanColors = [];
 
       for (let i = 0; i < planetCount; i++) {
-        const palette = generatePlanetPalette(i);
+        const paletteIndex = i === 1 ? 4 : i === 4 ? 1 : i;
+        const palette = generatePlanetPalette(paletteIndex);
         const [layer1, layer2, layer3, layer4, layer5] = palette.layers;
         oceanColors.push(palette.ocean.clone());
 
@@ -809,6 +820,59 @@ const Background = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (!sunMesh || !mainLight || !fillAmbientLight) {
+      return;
+    }
+
+    const sunMaterial = sunMesh.material as THREE.MeshBasicMaterial;
+    const targetSunScale = darkMode ? 2.4 : 3.0;
+    const targetMainIntensity = darkMode ? 150 : 600;
+    const targetAmbientIntensity = darkMode ? 0.8 : 3.0;
+    const targetLightColor = darkMode
+      ? new THREE.Color(0xbdd7ff)
+      : new THREE.Color(0xffffff);
+    const targetSunTint = darkMode
+      ? new THREE.Color(0x876c00)
+      : new THREE.Color(0xffcc00);
+
+    gsap.to(mainLight, {
+      duration: 0.7,
+      intensity: targetMainIntensity,
+      ease: "power2.inOut",
+    });
+
+    gsap.to(fillAmbientLight, {
+      duration: 0.7,
+      intensity: targetAmbientIntensity,
+      ease: "power2.inOut",
+    });
+
+    gsap.to(sunMesh.scale, {
+      duration: 0.7,
+      x: targetSunScale,
+      y: targetSunScale,
+      z: targetSunScale,
+      ease: "power2.inOut",
+    });
+
+    gsap.to(mainLight.color, {
+      duration: 0.7,
+      r: targetLightColor.r,
+      g: targetLightColor.g,
+      b: targetLightColor.b,
+      ease: "power2.inOut",
+    });
+
+    gsap.to(sunMaterial.color, {
+      duration: 0.7,
+      r: targetSunTint.r,
+      g: targetSunTint.g,
+      b: targetSunTint.b,
+      ease: "power2.inOut",
+    });
+  }, [darkMode]);
 
   return <div ref={mountRef} />;
 };

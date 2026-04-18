@@ -11,7 +11,7 @@ const MainMenu = ({ callback, start }: MainMenuProps) => {
       callback={callback}
       minimizedText="Menu"
       minimize={!start}
-      buttons={["RESUME", "ABOUT ME", "SKILLS", "CONTACT", "PROJECTS"]}
+      buttons={["ABOUT ME", "PROJECTS", "SKILLS", "RESUME", "CONTACT"]}
       text="lorem ipsum dolor sit amet consectetur adipiscing elit sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim
             ad minim veniam quis nostrud exercitation ullamco laboris nisi ut

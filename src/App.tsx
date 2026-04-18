@@ -12,11 +12,11 @@ import { useEffect, useRef, useState } from "react";
 
 export enum MenuEnum {
   MAIN,
-  RESUME,
   ABOUT_ME,
-  SKILLS,
-  CONTACT,
   PROJECTS,
+  SKILLS,
+  RESUME,
+  CONTACT,
   START,
 }
 
@@ -42,6 +42,7 @@ function toString(menu: MenuEnum): string {
 function App() {
   const [menu, setMenu] = useState<MenuEnum>(MenuEnum.START);
   const [isSubMenuMinimized, setIsSubMenuMinimized] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const submenuOpenTimeoutRef = useRef<number | null>(null);
   const projectButtons = ["PROJECT A", "PROJECT B", "PROJECT C", "PROJECT D", "BACK"];
 
@@ -84,9 +85,12 @@ function App() {
   return (
     <div>
       <div className="app-container">
-        <Background />
+        <Background darkMode={darkMode} />
         <div className="app-switch-container">
-          <Switch></Switch>
+          <Switch
+            darkMode={darkMode}
+            onToggle={() => setDarkMode((prev) => !prev)}
+          ></Switch>
         </div>
         <div className="app-menu-container">
           {menu === MenuEnum.START || menu === MenuEnum.MAIN ? (

@@ -1,7 +1,9 @@
-import { useState } from "react";
+interface SwitchProps {
+  darkMode: boolean;
+  onToggle: () => void;
+}
 
-function Switch() {
-  const [darkMode, setDarkMode] = useState(false);
+function Switch({ darkMode, onToggle }: SwitchProps) {
 
   const darkIcon = (
     <svg
@@ -34,15 +36,12 @@ function Switch() {
     </svg>
   );
 
-  function toggleTheme() {
-    setDarkMode(!darkMode);
-  }
-
   return (
     <>
       <button
         className="w-20 h-10 rounded-full bg-white flex items-center transition duration-300 focus:outline-none shadow"
-        onClick={toggleTheme}
+        onClick={onToggle}
+        aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
       >
         <div
           id="switch-toggle"
