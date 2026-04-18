@@ -1,4 +1,3 @@
-import Footer from "./components/Footer";
 import Switch from "./components/Switch";
 import Background, {
   BackgroundPlanetTransition,
@@ -126,7 +125,6 @@ function App() {
           )}
         </div>
       </div>
-      <Footer></Footer>
     </div>
   );
 }

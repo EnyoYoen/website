@@ -1,0 +1,34 @@
+@font-face {
+  font-family: "Roboto";
+  src: url("/src/assets/fonts/Roboto-Regular.ttf") format("truetype");
+}
+
+.contact-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.contact-button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.contact-label {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.contact-back-button {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}

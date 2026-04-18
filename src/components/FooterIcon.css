@@ -1,0 +1,35 @@
+.footer-icon button {
+  border-radius: 0.375rem;
+  height: 3rem;
+  width: 3rem;
+  background-color: #2d3f56;
+  padding: 0.625rem;
+  border: 1px transparent;
+  text-align: center;
+  font-size: 0.875rem;
+  color: white;
+  transition: all 0.3s;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  opacity: 1;
+}
+
+.footer-icon button:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background-color: #3d4f66;
+}
+
+.footer-icon button:focus {
+  background-color: #3d4f66;
+  box-shadow: none;
+}
+
+.footer-icon button:active {
+  background-color: #3d4f66;
+  box-shadow: none;
+}
+
+.footer-icon button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  box-shadow: none;
+}

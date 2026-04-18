@@ -1,5 +1,6 @@
 import Menu from "./Menu";
 import ResumeMenu from "./ResumeMenu";
+import ContactMenu from "./ContactMenu";
 import { MenuEnum } from "../App";
 
 interface SubMenuProps {
@@ -27,30 +28,37 @@ const SubMenu = ({
   minimize,
   menu,
 }: SubMenuProps) => {
-  return (
-    menu === MenuEnum.RESUME ? (
-      <ResumeMenu
-        callback={callback}
-        minimizedText={minimizedText}
-        minimize={minimize ?? false}
-        text={text}
-        minimizeOnClick={minimizeOnClick}
-        className={className}
-        menu={menu}
-      />
-    ) : (
-      <Menu
-        callback={callback}
-        minimizedText={minimizedText}
-        buttons={buttons ?? ["BACK"]}
-        text={text}
-        minimize={minimize ?? false}
-        onButtonHover={onButtonHover}
-        onButtonLeave={onButtonLeave}
-        minimizeOnClick={minimizeOnClick}
-        className={className}
-      />
-    )
+  return menu === MenuEnum.RESUME ? (
+    <ResumeMenu
+      callback={callback}
+      minimizedText={minimizedText}
+      minimize={minimize ?? false}
+      text={text}
+      minimizeOnClick={minimizeOnClick}
+      className={className}
+      menu={menu}
+    />
+  ) : menu === MenuEnum.CONTACT ? (
+    <ContactMenu
+      callback={callback}
+      minimizedText={minimizedText}
+      minimize={minimize ?? false}
+      text={text}
+      minimizeOnClick={minimizeOnClick}
+      className={className}
+    />
+  ) : (
+    <Menu
+      callback={callback}
+      minimizedText={minimizedText}
+      buttons={buttons ?? ["BACK"]}
+      text={text}
+      minimize={minimize ?? false}
+      onButtonHover={onButtonHover}
+      onButtonLeave={onButtonLeave}
+      minimizeOnClick={minimizeOnClick}
+      className={className}
+    />
   );
 };
 
