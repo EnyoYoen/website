@@ -82,6 +82,7 @@ let planetParams: PlanetParams[] = [];
 let atmosphereParams: AtmosphereParams[] = [];
 let oceanColors: THREE.Color[] = [];
 let proceduralPlanet: THREE.Mesh | null = null;
+let proceduralOcclusionMaterial: THREE.ShaderMaterial | null = null;
 let oceanSphere: THREE.Mesh | null = null;
 let zoomedPlanetIndex: number | null = null;
 let projectPins: THREE.Mesh[] = [];
@@ -295,6 +296,7 @@ function BackgroundPlanetTransition(planetIndex: number) {
   transitionTime = performance.now();
 
   const targetPlanet = planets[planetIndex].planet;
+  targetPlanet.removeFromParent();
   const targetPosition = targetPlanet.position.clone();
   zoomedPlanetIndex = planetIndex;
 
@@ -325,6 +327,14 @@ function BackgroundPlanetTransition(planetIndex: number) {
     uniforms: planetParams[planetIndex],
     vertexShader: planetVertexShader,
     fragmentShader: planetFragmentShader,
+  });
+
+  proceduralOcclusionMaterial = new THREE.ShaderMaterial({
+    uniforms: planetParams[planetIndex],
+    vertexShader: planetVertexShader,
+    fragmentShader: `void main(){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }`,
   });
 
   proceduralPlanet = new THREE.Mesh(
@@ -362,12 +372,16 @@ function BackgroundPlanetTransition(planetIndex: number) {
   targetPlanet.visible = false;
 
   for (let i = 0; i < trajectories.length; i++) {
+    const ringMaterial = trajectories[i].material as THREE.Material & {
+      transparent?: boolean;
+      depthWrite?: boolean;
+    };
+    ringMaterial.transparent = true;
+    ringMaterial.depthWrite = false;
+
     gsap.to(trajectories[i].material, {
-      duration: 2,
+      duration: 1.5,
       opacity: 0,
-      onUpdate: () => {
-        (trajectories[i].material as THREE.Material).transparent = true;
-      },
       onComplete: () => {
         scene.remove(trajectories[i]);
       },
@@ -419,6 +433,7 @@ function BackgroundMenuTransition() {
 
   if (zoomedPlanetIndex !== null) {
     planets[zoomedPlanetIndex].planet.visible = true;
+    scene.add(planets[zoomedPlanetIndex].planet);
     zoomedPlanetIndex = null;
   }
 
@@ -428,6 +443,11 @@ function BackgroundMenuTransition() {
     proceduralPlanet.geometry.dispose();
     (proceduralPlanet.material as THREE.Material).dispose();
     proceduralPlanet = null;
+  }
+
+  if (proceduralOcclusionMaterial) {
+    proceduralOcclusionMaterial.dispose();
+    proceduralOcclusionMaterial = null;
   }
 
   if (oceanSphere) {
@@ -445,12 +465,16 @@ function BackgroundMenuTransition() {
 
   for (let i = 0; i < trajectories.length; i++) {
     scene.add(trajectories[i]);
+    const ringMaterial = trajectories[i].material as THREE.Material & {
+      transparent?: boolean;
+      depthWrite?: boolean;
+    };
+    ringMaterial.transparent = true;
+    ringMaterial.depthWrite = false;
+
     gsap.to(trajectories[i].material, {
       duration: 2,
       opacity: 1,
-      onUpdate: () => {
-        (trajectories[i].material as THREE.Material).transparent = false;
-      },
       ease: "power2.inOut",
     });
   }
@@ -674,7 +698,7 @@ const Background = ({ darkMode }: BackgroundProps) => {
           period: { value: 0.6 },
           persistence: { value: 0.484 },
           lacunarity: { value: 1.8 },
-          octaves: { value: 10 },
+          octaves: { value: 8 },
           undulation: { value: 0.0 },
           ambientIntensity: { value: 0.02 },
           diffuseIntensity: { value: 1 },
@@ -724,6 +748,9 @@ const Background = ({ darkMode }: BackgroundProps) => {
         const ringGeometry = new THREE.TorusGeometry(distance, 0.04, 12, 128);
         const ringMaterial = new THREE.MeshBasicMaterial({
           color: 0xaaaaaa,
+          transparent: true,
+          opacity: 1,
+          depthWrite: false,
         });
         const trajectory = new THREE.Mesh(ringGeometry, ringMaterial);
         trajectory.rotation.x = Math.PI / 2;
@@ -804,6 +831,11 @@ const Background = ({ darkMode }: BackgroundProps) => {
         (obj as any).isLine
       ) {
         materials[obj.uuid] = (obj as any).material;
+        if (obj === proceduralPlanet && proceduralOcclusionMaterial) {
+          (obj as any).material = proceduralOcclusionMaterial;
+          return;
+        }
+
         (obj as any).material = darkMaterial;
       }
     }
