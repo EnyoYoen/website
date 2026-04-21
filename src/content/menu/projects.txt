@@ -1,0 +1,1 @@
+Hover a project button to rotate the planet and center its pin.

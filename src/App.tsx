@@ -8,6 +8,7 @@ import "./App.css";
 import MainMenu from "./components/MainMenu";
 import SubMenu from "./components/SubMenu";
 import { useEffect, useRef, useState } from "react";
+import { menuText } from "./content/menuText";
 
 export enum MenuEnum {
   MAIN,
@@ -44,6 +45,13 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const submenuOpenTimeoutRef = useRef<number | null>(null);
   const projectButtons = ["PROJECT A", "PROJECT B", "PROJECT C", "PROJECT D", "BACK"];
+  const menuTextByEnum: Partial<Record<MenuEnum, string>> = {
+    [MenuEnum.ABOUT_ME]: menuText.aboutMe,
+    [MenuEnum.PROJECTS]: menuText.projects,
+    [MenuEnum.SKILLS]: menuText.skills,
+    [MenuEnum.RESUME]: menuText.resume,
+    [MenuEnum.CONTACT]: menuText.contact,
+  };
 
   const scheduleSubMenuReopen = () => {
     if (submenuOpenTimeoutRef.current !== null) {
@@ -103,7 +111,7 @@ function App() {
               }}
               menu={menu}
               minimizedText={toString(menu)}
-              text="Hover a project button to rotate the planet and center its pin."
+              text={menuTextByEnum[MenuEnum.PROJECTS] ?? ""}
               buttons={projectButtons}
               onButtonHover={(button) => {
                 if (button < projectButtons.length - 1) {
@@ -119,7 +127,7 @@ function App() {
               callback={() => callback(-1)}
               menu={menu}
               minimizedText={toString(menu)}
-              text="lorem ipsum dolor sit amet consectetur adipiscing elit sed do"
+              text={menuTextByEnum[menu] ?? ""}
               minimize={isSubMenuMinimized}
             ></SubMenu>
           )}
