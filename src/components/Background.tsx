@@ -654,6 +654,9 @@ const Background = ({ darkMode }: BackgroundProps) => {
 
       const labels = ["Mercury", "Venus", "Earth", "Mars", "Jupiter"];
       const minOrbitClearance = 0.35;
+      const keplerReferenceDistance = 8;
+      const keplerReferenceAngularVelocity = 0.05;
+      const keplerRandomness = 0.2;
 
       let distance = 5;
       let scale = 1;
@@ -673,12 +676,16 @@ const Background = ({ darkMode }: BackgroundProps) => {
 
         distance += (2 + (Math.random() * 5 + scale)) * 0.6;
         const angle = Math.random() * Math.PI * 2;
-        let angleVelocity = Math.random() * 0.01 + 0.01;
+        const normalizedDistance = Math.max(distance, 0.001) / keplerReferenceDistance;
+        const keplerAngularVelocity =
+          keplerReferenceAngularVelocity * Math.pow(normalizedDistance, -1.5);
+        const jitter = 1 + (Math.random() * 2 - 1) * keplerRandomness;
+        let angleVelocity = keplerAngularVelocity * jitter;
         scale = Math.random() * 0.5 + 0.5;
 
         if (i === projectsPlanetIndex) {
           scale = 1.25;
-          angleVelocity = 0.006;
+          angleVelocity *= 0.85;
         }
 
         if (i > 0) {
