@@ -653,6 +653,7 @@ const Background = ({ darkMode }: BackgroundProps) => {
       sunMesh = sun;
 
       const labels = ["Mercury", "Venus", "Earth", "Mars", "Jupiter"];
+      const minOrbitClearance = 0.35;
 
       let distance = 5;
       let scale = 1;
@@ -678,6 +679,17 @@ const Background = ({ darkMode }: BackgroundProps) => {
         if (i === projectsPlanetIndex) {
           scale = 1.25;
           angleVelocity = 0.006;
+        }
+
+        if (i > 0) {
+          const previousPlanet = planets[i - 1];
+          const previousScale = previousPlanet.planet.scale.x;
+          const orbitGap = distance - previousPlanet.distance;
+          const minimumOrbitGap = previousScale + scale + minOrbitClearance;
+
+          if (orbitGap < minimumOrbitGap) {
+            distance = previousPlanet.distance + minimumOrbitGap;
+          }
         }
 
         planet.position.set(
