@@ -1,0 +1,87 @@
+.app-project-page {
+  position: fixed;
+  inset: 0;
+  z-index: 850;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  color: #fff;
+  background: radial-gradient(circle at 35% 22%, #1a2436 0%, #090d15 58%, #000 100%);
+  text-align: center;
+}
+
+.app-project-page h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 4vw, 3rem);
+  letter-spacing: 0.08em;
+}
+
+.app-project-page p {
+  margin-top: 18px;
+  max-width: 620px;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.6;
+  opacity: 0.92;
+}
+
+.app-project-page-back {
+  margin-top: 24px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.app-project-page-back:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.project-page-stack {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 760px;
+}
+
+.project-page-chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.project-page-section {
+  margin-top: 20px;
+  max-width: 760px;
+  line-height: 1.65;
+  opacity: 0.95;
+}
+
+.project-page-links {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.project-page-link {
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.project-page-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+}

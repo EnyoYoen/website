@@ -21,3 +21,11 @@
   justify-content: center;
   align-items: center;
 }
+
+.app-transition-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  pointer-events: none;
+  z-index: 900;
+}

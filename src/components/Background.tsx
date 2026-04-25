@@ -84,6 +84,7 @@ let oceanColors: THREE.Color[] = [];
 let proceduralPlanet: THREE.Mesh | null = null;
 let proceduralOcclusionMaterial: THREE.ShaderMaterial | null = null;
 let oceanSphere: THREE.Mesh | null = null;
+let spaceBackgroundTexture: THREE.CubeTexture | null = null;
 let zoomedPlanetIndex: number | null = null;
 let projectPins: THREE.Mesh[] = [];
 let projectPinDirections: THREE.Vector3[] = [];
@@ -286,6 +287,68 @@ function BackgroundFocusProjectPin(projectIndex: number) {
   });
 }
 
+function BackgroundProjectDiveTransition(
+  projectIndex: number,
+  onEnterPlanet?: () => void
+) {
+  if (
+    !zoom ||
+    zoomedPlanetIndex !== projectsPlanetIndex ||
+    !proceduralPlanet ||
+    projectIndex < 0 ||
+    projectIndex >= projectPinDirections.length
+  ) {
+    onEnterPlanet?.();
+    return;
+  }
+
+  clearProjectPins();
+  BackgroundFocusProjectPin(projectIndex);
+  controls.autoRotate = false;
+
+  const targetPosition = proceduralPlanet.position.clone();
+  const toCenter = targetPosition.clone().sub(camera.position).normalize();
+  const nearSurface = targetPosition.clone().add(toCenter.clone().multiplyScalar(1.35));
+  const insidePlanet = targetPosition.clone().add(toCenter.clone().multiplyScalar(0.06));
+
+  let entered = false;
+
+  gsap.timeline().to(camera.position, {
+    duration: 2.8,
+    x: nearSurface.x,
+    y: nearSurface.y,
+    z: nearSurface.z,
+    ease: "power1.inOut",
+    onUpdate: () => {
+      camera.lookAt(targetPosition);
+      camera.updateProjectionMatrix();
+    },
+  }).to(camera.position, {
+    duration: 1.4,
+    x: insidePlanet.x,
+    y: insidePlanet.y,
+    z: insidePlanet.z,
+    ease: "power3.in",
+    onStart: () => {
+      if (!entered) {
+        entered = true;
+        scene.background = new THREE.Color(0x000000);
+        if (proceduralPlanet) {
+          proceduralPlanet.visible = true;
+        }
+        if (oceanSphere) {
+          oceanSphere.visible = false;
+        }
+        onEnterPlanet?.();
+      }
+    },
+    onUpdate: () => {
+      camera.lookAt(targetPosition);
+      camera.updateProjectionMatrix();
+    },
+  });
+}
+
 // Zoom Transition function
 function BackgroundPlanetTransition(planetIndex: number) {
   if (planetIndex < 0 || planetIndex >= planetCount || zoom) {
@@ -431,6 +494,10 @@ function BackgroundMenuTransition() {
   zoom = false;
   timeOffset += performance.now() - transitionTime;
 
+  if (spaceBackgroundTexture) {
+    scene.background = spaceBackgroundTexture;
+  }
+
   if (zoomedPlanetIndex !== null) {
     planets[zoomedPlanetIndex].planet.visible = true;
     scene.add(planets[zoomedPlanetIndex].planet);
@@ -438,10 +505,15 @@ function BackgroundMenuTransition() {
   }
 
   if (proceduralPlanet) {
+    const currentMaterial = proceduralPlanet.material as THREE.Material;
     clearProjectPins();
     scene.remove(proceduralPlanet);
     proceduralPlanet.geometry.dispose();
-    (proceduralPlanet.material as THREE.Material).dispose();
+    if (
+      currentMaterial !== proceduralOcclusionMaterial
+    ) {
+      currentMaterial.dispose();
+    }
     proceduralPlanet = null;
   }
 
@@ -803,6 +875,7 @@ const Background = ({ darkMode }: BackgroundProps) => {
         "src/assets/images/raster/space_zn.png",
       ]);
       texture.mapping = THREE.CubeRefractionMapping;
+      spaceBackgroundTexture = texture;
       scene.background = texture;
 
       render();
@@ -928,4 +1001,5 @@ export {
   BackgroundPlanetTransition,
   BackgroundMenuTransition,
   BackgroundFocusProjectPin,
+  BackgroundProjectDiveTransition,
 };
